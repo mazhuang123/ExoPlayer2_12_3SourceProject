@@ -52,7 +52,13 @@ public final class ProgressiveDownloader implements Downloader {
   @Deprecated
   public ProgressiveDownloader(
       Uri uri, @Nullable String customCacheKey, CacheDataSource.Factory cacheDataSourceFactory) {
-    this(uri, customCacheKey, cacheDataSourceFactory, Runnable::run);
+//    this(uri, customCacheKey, cacheDataSourceFactory, Runnable::run);
+      this(uri, customCacheKey, cacheDataSourceFactory, new Executor() {
+          @Override
+          public void execute(Runnable runnable) {
+
+          }
+      });
   }
 
   /**
@@ -64,7 +70,13 @@ public final class ProgressiveDownloader implements Downloader {
    */
   public ProgressiveDownloader(
       MediaItem mediaItem, CacheDataSource.Factory cacheDataSourceFactory) {
-    this(mediaItem, cacheDataSourceFactory, Runnable::run);
+//    this(mediaItem, cacheDataSourceFactory, Runnable::run);
+      this(mediaItem, cacheDataSourceFactory, new Executor() {
+          @Override
+          public void execute(Runnable runnable) {
+
+          }
+      });
   }
 
   /**
@@ -105,7 +117,13 @@ public final class ProgressiveDownloader implements Downloader {
             .build();
     dataSource = cacheDataSourceFactory.createDataSourceForDownloading();
     @SuppressWarnings("methodref.receiver.bound.invalid")
-    CacheWriter.ProgressListener progressListener = this::onProgress;
+//    CacheWriter.ProgressListener progressListener = this::onProgress;
+      CacheWriter.ProgressListener progressListener = new CacheWriter.ProgressListener() {
+          @Override
+          public void onProgress(long requestLength, long bytesCached, long newBytesCached) {
+              onProgress(requestLength,bytesCached,newBytesCached);
+          }
+      };
     cacheWriter =
         new CacheWriter(
             dataSource,

@@ -249,13 +249,22 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
     ComponentListener componentListener = new ComponentListener();
     this.componentListener = componentListener;
     prepareChildSource(CHILD_SOURCE_MEDIA_PERIOD_ID, contentMediaSource);
-    mainHandler.post(
-        () -> {
-          if (adTagDataSpec != null) {
-            adsLoader.setAdTagDataSpec(adTagDataSpec);
-          }
-          adsLoader.start(componentListener, adViewProvider);
-        });
+//    mainHandler.post(
+//        () -> {
+//          if (adTagDataSpec != null) {
+//            adsLoader.setAdTagDataSpec(adTagDataSpec);
+//          }
+//          adsLoader.start(componentListener, adViewProvider);
+//        });
+    mainHandler.post(new Runnable() {
+        @Override
+        public void run() {
+            if (adTagDataSpec != null) {
+                adsLoader.setAdTagDataSpec(adTagDataSpec);
+            }
+            adsLoader.start(componentListener, adViewProvider);
+        }
+    });
   }
 
   @Override
@@ -311,7 +320,13 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
     contentTimeline = null;
     adPlaybackState = null;
     adMediaSourceHolders = new AdMediaSourceHolder[0][];
-    mainHandler.post(adsLoader::stop);
+//    mainHandler.post(adsLoader::stop);
+    mainHandler.post(new Runnable() {
+        @Override
+        public void run() {
+            adsLoader.stop();
+        }
+    });
   }
 
   @Override
@@ -430,13 +445,22 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
       if (released) {
         return;
       }
-      playerHandler.post(
-          () -> {
-            if (released) {
-              return;
-            }
-            AdsMediaSource.this.onAdPlaybackState(adPlaybackState);
-          });
+//      playerHandler.post(
+//          () -> {
+//            if (released) {
+//              return;
+//            }
+//            AdsMediaSource.this.onAdPlaybackState(adPlaybackState);
+//          });
+      playerHandler.post(new Runnable() {
+          @Override
+          public void run() {
+              if (released) {
+                  return;
+              }
+              AdsMediaSource.this.onAdPlaybackState(adPlaybackState);
+          }
+      });
     }
 
     @Override
@@ -466,10 +490,17 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
 
     @Override
     public void onPrepareComplete(MediaPeriodId mediaPeriodId) {
-      mainHandler.post(
-          () ->
+//      mainHandler.post(
+//          () ->
+//              adsLoader.handlePrepareComplete(
+//                  mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup));
+      mainHandler.post(new Runnable() {
+          @Override
+          public void run() {
               adsLoader.handlePrepareComplete(
-                  mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup));
+                      mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup);
+          }
+      });
     }
 
     @Override
@@ -483,10 +514,17 @@ public final class AdsMediaSource extends CompositeMediaSource<MediaPeriodId> {
               C.DATA_TYPE_AD,
               AdLoadException.createForAd(exception),
               /* wasCanceled= */ true);
-      mainHandler.post(
-          () ->
+//      mainHandler.post(
+//          () ->
+//              adsLoader.handlePrepareError(
+//                  mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup, exception));
+      mainHandler.post(new Runnable() {
+          @Override
+          public void run() {
               adsLoader.handlePrepareError(
-                  mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup, exception));
+                      mediaPeriodId.adGroupIndex, mediaPeriodId.adIndexInAdGroup, exception);
+          }
+      });
     }
   }
 

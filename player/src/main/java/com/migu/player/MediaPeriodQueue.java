@@ -430,8 +430,15 @@ import static java.lang.Math.max;
         period = period.getNext();
       }
       @Nullable MediaPeriodId readingPeriodId = reading == null ? null : reading.info.id;
-      analyticsCollectorHandler.post(
-          () -> analyticsCollector.updateMediaPeriodQueueInfo(builder.build(), readingPeriodId));
+//      analyticsCollectorHandler.post(
+//          () -> analyticsCollector.updateMediaPeriodQueueInfo(builder.build(), readingPeriodId));
+
+      analyticsCollectorHandler.post(new Runnable() {
+          @Override
+          public void run() {
+              analyticsCollector.updateMediaPeriodQueueInfo(builder.build(), readingPeriodId);
+          }
+      });
     }
   }
 

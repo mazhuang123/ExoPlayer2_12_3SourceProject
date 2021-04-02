@@ -219,14 +219,23 @@ public interface HttpDataSource extends DataSource {
   }
 
   /** A {@link Predicate} that rejects content types often used for pay-walls. */
-  Predicate<String> REJECT_PAYWALL_TYPES =
-      contentType -> {
-        contentType = Util.toLowerInvariant(contentType);
-        return !TextUtils.isEmpty(contentType)
-            && (!contentType.contains("text") || contentType.contains("text/vtt"))
-            && !contentType.contains("html")
-            && !contentType.contains("xml");
-      };
+//  Predicate<String> REJECT_PAYWALL_TYPES =
+//      contentType -> {
+//        contentType = Util.toLowerInvariant(contentType);
+//        return !TextUtils.isEmpty(contentType)
+//            && (!contentType.contains("text") || contentType.contains("text/vtt"))
+//            && !contentType.contains("html")
+//            && !contentType.contains("xml");
+//      };
+    Predicate<String> REJECT_PAYWALL_TYPES = new Predicate<String>() {
+        @Override
+        public boolean apply(String contentType) {
+            return !TextUtils.isEmpty(contentType)
+                    && (!contentType.contains("text") || contentType.contains("text/vtt"))
+                    && !contentType.contains("html")
+                    && !contentType.contains("xml");
+        }
+    };
 
   /**
    * Thrown when an error is encountered when trying to read from a {@link HttpDataSource}.

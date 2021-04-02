@@ -26,6 +26,7 @@ import com.migu.player.util.Assertions;
 import com.migu.player.util.Util;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.lang.Math.max;
@@ -73,7 +74,13 @@ public abstract class BaseTrackSelection implements TrackSelection {
       formats[i] = group.getFormat(tracks[i]);
     }
     // Sort in order of decreasing bandwidth.
-    Arrays.sort(formats, (a, b) -> b.bitrate - a.bitrate);
+//    Arrays.sort(formats, (a, b) -> b.bitrate - a.bitrate);
+    Arrays.sort(formats, new Comparator<Format>() {
+        @Override
+        public int compare(Format a, Format b) {
+            return b.bitrate - a.bitrate;
+        }
+    });
     // Set the format indices in the same order.
     this.tracks = new int[length];
     for (int i = 0; i < length; i++) {

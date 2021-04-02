@@ -18,6 +18,7 @@ package com.migu.player.extractor.mp4;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Function;
 import com.migu.player.C;
 import com.migu.player.Format;
 import com.migu.player.ParserException;
@@ -59,8 +60,13 @@ import static java.lang.Math.min;
 public final class Mp4Extractor implements Extractor, SeekMap {
 
   /** Factory for {@link Mp4Extractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Mp4Extractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Mp4Extractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new Mp4Extractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag value is {@link
    * #FLAG_WORKAROUND_IGNORE_EDIT_LISTS}.
@@ -416,15 +422,28 @@ public final class Mp4Extractor implements Extractor, SeekMap {
     }
 
     boolean ignoreEditLists = (flags & FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0;
-    List<TrackSampleTable> trackSampleTables =
-        parseTraks(
-            moov,
-            gaplessInfoHolder,
-            /* duration= */ C.TIME_UNSET,
-            /* drmInitData= */ null,
-            ignoreEditLists,
-            isQuickTime,
-            /* modifyTrackFunction= */ track -> track);
+//    List<TrackSampleTable> trackSampleTables =
+//        parseTraks(
+//            moov,
+//            gaplessInfoHolder,
+//            /* duration= */ C.TIME_UNSET,
+//            /* drmInitData= */ null,
+//            ignoreEditLists,
+//            isQuickTime,
+//            /* modifyTrackFunction= */ track -> track);
+      List<TrackSampleTable> trackSampleTables =
+              parseTraks(
+                      moov,
+                      gaplessInfoHolder,
+                      /* duration= */ C.TIME_UNSET,
+                      /* drmInitData= */ null,
+                      ignoreEditLists,
+                      isQuickTime, new Function<Track, Track>() {
+                          @Override
+                          public Track apply(Track track) {
+                              return track;
+                          }
+                      });
 
     ExtractorOutput extractorOutput = checkNotNull(this.extractorOutput);
     int trackCount = trackSampleTables.size();

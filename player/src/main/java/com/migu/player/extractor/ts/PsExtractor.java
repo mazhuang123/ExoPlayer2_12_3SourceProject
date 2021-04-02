@@ -41,8 +41,13 @@ import java.io.IOException;
 public final class PsExtractor implements Extractor {
 
   /** Factory for {@link PsExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new PsExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new PsExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new PsExtractor()};
+        }
+    };
   /* package */ static final int PACK_START_CODE = 0x000001BA;
   /* package */ static final int SYSTEM_HEADER_START_CODE = 0x000001BB;
   /* package */ static final int PACKET_START_CODE_PREFIX = 0x000001;

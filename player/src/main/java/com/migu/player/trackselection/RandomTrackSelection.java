@@ -54,9 +54,15 @@ public final class RandomTrackSelection extends BaseTrackSelection {
     @Override
     public  TrackSelection[] createTrackSelections(
          Definition[] definitions, BandwidthMeter bandwidthMeter) {
-      return TrackSelectionUtil.createTrackSelectionsForDefinitions(
-          definitions,
-          definition -> new RandomTrackSelection(definition.group, definition.tracks, random));
+//      return TrackSelectionUtil.createTrackSelectionsForDefinitions(
+//          definitions,
+//          definition -> new RandomTrackSelection(definition.group, definition.tracks, random));
+      return TrackSelectionUtil.createTrackSelectionsForDefinitions(definitions, new TrackSelectionUtil.AdaptiveTrackSelectionFactory() {
+          @Override
+          public TrackSelection createAdaptiveTrackSelection(Definition trackSelectionDefinition) {
+              return new RandomTrackSelection(trackSelectionDefinition.group, trackSelectionDefinition.tracks, random);
+          }
+      });
     }
   }
 

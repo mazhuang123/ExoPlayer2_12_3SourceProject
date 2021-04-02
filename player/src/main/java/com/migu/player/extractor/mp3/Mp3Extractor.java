@@ -54,8 +54,13 @@ import java.lang.annotation.RetentionPolicy;
 public final class Mp3Extractor implements Extractor {
 
   /** Factory for {@link Mp3Extractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Mp3Extractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Mp3Extractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new Mp3Extractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag values are {@link
    * #FLAG_ENABLE_CONSTANT_BITRATE_SEEKING}, {@link #FLAG_ENABLE_INDEX_SEEKING} and {@link
@@ -98,11 +103,17 @@ public final class Mp3Extractor implements Extractor {
   public static final int FLAG_DISABLE_ID3_METADATA = 1 << 2;
 
   /** Predicate that matches ID3 frames containing only required gapless/seeking metadata. */
-  private static final FramePredicate REQUIRED_ID3_FRAME_PREDICATE =
-      (majorVersion, id0, id1, id2, id3) ->
-          ((id0 == 'C' && id1 == 'O' && id2 == 'M' && (id3 == 'M' || majorVersion == 2))
-              || (id0 == 'M' && id1 == 'L' && id2 == 'L' && (id3 == 'T' || majorVersion == 2)));
-
+//  private static final FramePredicate REQUIRED_ID3_FRAME_PREDICATE =
+//      (majorVersion, id0, id1, id2, id3) ->
+//          ((id0 == 'C' && id1 == 'O' && id2 == 'M' && (id3 == 'M' || majorVersion == 2))
+//              || (id0 == 'M' && id1 == 'L' && id2 == 'L' && (id3 == 'T' || majorVersion == 2)));
+    private static final FramePredicate REQUIRED_ID3_FRAME_PREDICATE = new FramePredicate() {
+        @Override
+        public boolean evaluate(int majorVersion, int id0, int id1, int id2, int id3) {
+            return ((id0 == 'C' && id1 == 'O' && id2 == 'M' && (id3 == 'M' || majorVersion == 2))
+                    || (id0 == 'M' && id1 == 'L' && id2 == 'L' && (id3 == 'T' || majorVersion == 2)));
+        }
+    };
   /**
    * The maximum number of bytes to search when synchronizing, before giving up.
    */

@@ -212,7 +212,13 @@ import com.migu.player.util.Util;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-      eventHandler.post(StreamVolumeManager.this::updateVolumeAndNotifyIfChanged);
+//      eventHandler.post(StreamVolumeManager.this::updateVolumeAndNotifyIfChanged);
+      eventHandler.post(new Runnable() {
+          @Override
+          public void run() {
+                StreamVolumeManager.this.updateVolumeAndNotifyIfChanged();
+          }
+      });
     }
   }
 }

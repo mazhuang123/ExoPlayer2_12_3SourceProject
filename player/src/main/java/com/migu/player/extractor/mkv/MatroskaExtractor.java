@@ -72,8 +72,13 @@ import static java.lang.Math.min;
 public class MatroskaExtractor implements Extractor {
 
   /** Factory for {@link MatroskaExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new MatroskaExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new MatroskaExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new MatroskaExtractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag value is {@link
    * #FLAG_DISABLE_SEEK_FOR_CUES}.

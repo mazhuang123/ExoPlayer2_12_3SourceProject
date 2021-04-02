@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 
 import com.migu.player.C;
 import com.migu.player.Format;
+import com.migu.player.decoder.OutputBuffer;
 import com.migu.player.text.Subtitle;
 import com.migu.player.text.SubtitleDecoder;
 import com.migu.player.text.SubtitleDecoderException;
@@ -54,7 +55,13 @@ import java.util.PriorityQueue;
     }
     availableOutputBuffers = new ArrayDeque<>();
     for (int i = 0; i < NUM_OUTPUT_BUFFERS; i++) {
-      availableOutputBuffers.add(new CeaOutputBuffer(this::releaseOutputBuffer));
+        availableOutputBuffers.add(new CeaOutputBuffer(new OutputBuffer.Owner<CeaOutputBuffer>() {
+            @Override
+            public void releaseOutputBuffer(CeaOutputBuffer outputBuffer) {
+                CeaDecoder.this.releaseOutputBuffer(outputBuffer);
+            }
+        }));
+//      availableOutputBuffers.add(new CeaOutputBuffer(this::releaseOutputBuffer));
     }
     queuedInputBuffers = new PriorityQueue<>();
   }

@@ -54,8 +54,13 @@ import static java.lang.Math.min;
 public final class FlacExtractor implements Extractor {
 
   /** Factory for {@link FlacExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new FlacExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new FlacExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new FlacExtractor()};
+        }
+    };
   // LINT.IfChange
   /*
    * Flags in the two FLAC extractors should be kept in sync. If we ever change this then

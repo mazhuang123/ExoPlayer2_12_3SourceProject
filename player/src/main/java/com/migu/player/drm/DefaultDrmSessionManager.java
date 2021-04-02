@@ -789,11 +789,17 @@ public class DefaultDrmSessionManager implements DrmSessionManager {
       if (newReferenceCount == 1 && sessionKeepaliveMs != C.TIME_UNSET) {
         // Only the internal keep-alive reference remains, so we can start the timeout.
         keepaliveSessions.add(session);
-        Assertions.checkNotNull(sessionReleasingHandler)
-            .postAtTime(
-                () -> session.release(/* eventDispatcher= */ null),
-                session,
-                /* uptimeMillis= */ SystemClock.uptimeMillis() + sessionKeepaliveMs);
+        Assertions.checkNotNull(sessionReleasingHandler).postAtTime(new Runnable() {
+            @Override
+            public void run() {
+                session.release(/* eventDispatcher= */ null);
+            }
+        },session,SystemClock.uptimeMillis() + sessionKeepaliveMs);
+//        Assertions.checkNotNull(sessionReleasingHandler)
+//            .postAtTime(
+//                () -> session.release(/* eventDispatcher= */ null),
+//                session,
+//                /* uptimeMillis= */ SystemClock.uptimeMillis() + sessionKeepaliveMs);
       } else if (newReferenceCount == 0) {
         // This session is fully released.
         sessions.remove(session);

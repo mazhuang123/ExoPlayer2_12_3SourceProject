@@ -43,6 +43,7 @@ import com.migu.player.util.ParsableByteArray;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -777,9 +778,15 @@ public final class Cea708Decoder extends CeaDecoder {
         }
       }
     }
-    Collections.sort(
-        displayCueInfos,
-        (thisInfo, thatInfo) -> Integer.compare(thisInfo.priority, thatInfo.priority));
+//    Collections.sort(
+//        displayCueInfos,
+//        (thisInfo, thatInfo) -> Integer.compare(thisInfo.priority, thatInfo.priority));
+    Collections.sort(displayCueInfos, new Comparator<Cea708CueInfo>() {
+        @Override
+        public int compare(Cea708CueInfo thisInfo, Cea708CueInfo thatInfo) {
+            return Integer.compare(thisInfo.priority, thatInfo.priority);
+        }
+    });
     List<Cue> displayCues = new ArrayList<>(displayCueInfos.size());
     for (int i = 0; i < displayCueInfos.size(); i++) {
       displayCues.add(displayCueInfos.get(i).cue);

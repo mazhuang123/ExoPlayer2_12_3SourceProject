@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseIntArray;
 
@@ -33,6 +34,8 @@ import com.migu.player.Timeline;
 import com.migu.player.audio.AudioRendererEventListener;
 import com.migu.player.drm.DrmSessionManager;
 import com.migu.player.extractor.ExtractorsFactory;
+import com.migu.player.metadata.Metadata;
+import com.migu.player.metadata.MetadataOutput;
 import com.migu.player.source.DefaultMediaSourceFactory;
 import com.migu.player.source.MediaPeriod;
 import com.migu.player.source.MediaSource;
@@ -42,12 +45,15 @@ import com.migu.player.source.TrackGroup;
 import com.migu.player.source.TrackGroupArray;
 import com.migu.player.source.chunk.MediaChunk;
 import com.migu.player.source.chunk.MediaChunkIterator;
+import com.migu.player.text.Cue;
+import com.migu.player.text.TextOutput;
 import com.migu.player.trackselection.BaseTrackSelection;
 import com.migu.player.trackselection.DefaultTrackSelector;
 import com.migu.player.trackselection.DefaultTrackSelector.Parameters;
 import com.migu.player.trackselection.DefaultTrackSelector.SelectionOverride;
 import com.migu.player.trackselection.MappingTrackSelector.MappedTrackInfo;
 import com.migu.player.trackselection.TrackSelection;
+import com.migu.player.trackselection.TrackSelector;
 import com.migu.player.trackselection.TrackSelectorResult;
 import com.migu.player.upstream.Allocator;
 import com.migu.player.upstream.BandwidthMeter;
@@ -154,13 +160,31 @@ public final class DownloadHelper {
    *     renderersFactory}.
    */
   public static RendererCapabilities[] getRendererCapabilities(RenderersFactory renderersFactory) {
-    Renderer[] renderers =
-        renderersFactory.createRenderers(
+//    Renderer[] renderers =
+//        renderersFactory.createRenderers(
+//            Util.createHandlerForCurrentOrMainLooper(),
+//            new VideoRendererEventListener() {},
+//            new AudioRendererEventListener() {},
+//            (cues) -> {},
+//            (metadata) -> {});
+    Renderer[] renderers = renderersFactory.createRenderers(
             Util.createHandlerForCurrentOrMainLooper(),
-            new VideoRendererEventListener() {},
-            new AudioRendererEventListener() {},
-            (cues) -> {},
-            (metadata) -> {});
+            new VideoRendererEventListener() {
+            },
+            new AudioRendererEventListener() {
+            },
+            new TextOutput() {
+                @Override
+                public void onCues(List<Cue> cues) {
+
+                }
+            },
+            new MetadataOutput() {
+                @Override
+                public void onMetadata(Metadata metadata) {
+
+                }
+            });
     RendererCapabilities[] capabilities = new RendererCapabilities[renderers.length];
     for (int i = 0; i < renderers.length; i++) {
       capabilities[i] = renderers[i].getCapabilities();
@@ -489,7 +513,13 @@ public final class DownloadHelper {
         new DefaultTrackSelector(trackSelectorParameters, new DownloadTrackSelection.Factory());
     this.rendererCapabilities = rendererCapabilities;
     this.scratchSet = new SparseIntArray();
-    trackSelector.init(/* listener= */ () -> {}, new FakeBandwidthMeter());
+//    trackSelector.init(/* listener= */ () -> {}, new FakeBandwidthMeter());
+    trackSelector.init(new TrackSelector.InvalidationListener() {
+        @Override
+        public void onTrackSelectionsInvalidated() {
+
+        }
+    },new FakeBandwidthMeter());
     callbackHandler = Util.createHandlerForCurrentOrMainLooper();
     window = new Timeline.Window();
   }
@@ -506,7 +536,13 @@ public final class DownloadHelper {
     if (mediaSource != null) {
       mediaPreparer = new MediaPreparer(mediaSource, /* downloadHelper= */ this);
     } else {
-      callbackHandler.post(() -> callback.onPrepared(this));
+//      callbackHandler.post(() -> callback.onPrepared(this));
+      callbackHandler.post(new Runnable() {
+          @Override
+          public void run() {
+              callback.onPrepared(DownloadHelper.this);
+          }
+      });
     }
   }
 
@@ -791,11 +827,23 @@ public final class DownloadHelper {
       mappedTrackInfos[i] = checkNotNull(trackSelector.getCurrentMappedTrackInfo());
     }
     setPreparedWithMedia();
-    checkNotNull(callbackHandler).post(() -> checkNotNull(callback).onPrepared(this));
+//    checkNotNull(callbackHandler).post(() -> checkNotNull(callback).onPrepared(this));
+    checkNotNull(callbackHandler).post(new Runnable() {
+        @Override
+        public void run() {
+            checkNotNull(callback).onPrepared(DownloadHelper.this);
+        }
+    });
   }
 
   private void onMediaPreparationFailed(IOException error) {
-    checkNotNull(callbackHandler).post(() -> checkNotNull(callback).onPrepareError(this, error));
+//    checkNotNull(callbackHandler).post(() -> checkNotNull(callback).onPrepareError(this, error));
+    checkNotNull(callbackHandler).post(new Runnable() {
+        @Override
+        public void run() {
+            checkNotNull(callback).onPrepareError(DownloadHelper.this, error);
+        }
+    });
   }
 
   private void setPreparedWithMedia() {
@@ -906,8 +954,13 @@ public final class DownloadHelper {
       allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
       pendingMediaPeriods = new ArrayList<>();
       @SuppressWarnings("methodref.receiver.bound.invalid")
-      Handler downloadThreadHandler =
-          Util.createHandlerForCurrentOrMainLooper(this::handleDownloadHelperCallbackMessage);
+//      Handler downloadThreadHandler = Util.createHandlerForCurrentOrMainLooper(this::handleDownloadHelperCallbackMessage);
+        Handler downloadThreadHandler = Util.createHandlerForCurrentOrMainLooper(new Handler.Callback() {
+          @Override
+          public boolean handleMessage(@NonNull Message message) {
+              return handleDownloadHelperCallbackMessage(message);
+          }
+      });
       this.downloadHelperHandler = downloadThreadHandler;
       mediaSourceThread = new HandlerThread("ExoPlayer:DownloadHelper");
       mediaSourceThread.start();

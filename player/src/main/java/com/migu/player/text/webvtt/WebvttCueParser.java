@@ -17,8 +17,10 @@ package com.migu.player.text.webvtt;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -974,9 +976,14 @@ public final class WebvttCueParser {
 
   /** Information about a complete element (i.e. start tag and end position). */
   private static class Element {
-    private static final Comparator<Element> BY_START_POSITION_ASC =
-        (e1, e2) -> Integer.compare(e1.startTag.position, e2.startTag.position);
-
+//    private static final Comparator<Element> BY_START_POSITION_ASC =
+//        (e1, e2) -> Integer.compare(e1.startTag.position, e2.startTag.position);
+      private static final Comparator<Element> BY_START_POSITION_ASC = new Comparator<Element>() {
+          @Override
+          public int compare(Element e1, Element e2) {
+              return Integer.compare(e1.startTag.position, e2.startTag.position);
+          }
+      };
     private final StartTag startTag;
     /**
      * The position of the end of this element's text in the un-marked-up cue text (i.e. the

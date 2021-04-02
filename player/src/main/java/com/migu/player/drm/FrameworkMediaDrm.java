@@ -23,6 +23,7 @@ import android.media.MediaDrmException;
 import android.media.NotProvisionedException;
 import android.media.UnsupportedSchemeException;
 import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
@@ -56,16 +57,26 @@ public final class FrameworkMediaDrm implements ExoMediaDrm {
    * UUID. Returns a {@link DummyExoMediaDrm} if the protection scheme identified by the given UUID
    * is not supported by the device.
    */
-  public static final Provider DEFAULT_PROVIDER =
-      uuid -> {
-        try {
-          return newInstance(uuid);
-        } catch (UnsupportedDrmException e) {
-          Log.e(TAG, "Failed to instantiate a FrameworkMediaDrm for uuid: " + uuid + ".");
-          return new DummyExoMediaDrm();
+//  public static final Provider DEFAULT_PROVIDER =
+//      uuid -> {
+//        try {
+//          return newInstance(uuid);
+//        } catch (UnsupportedDrmException e) {
+//          Log.e(TAG, "Failed to instantiate a FrameworkMediaDrm for uuid: " + uuid + ".");
+//          return new DummyExoMediaDrm();
+//        }
+//      };
+    public static final Provider DEFAULT_PROVIDER = new Provider() {
+        @Override
+        public ExoMediaDrm acquireExoMediaDrm(UUID uuid) {
+            try {
+                return newInstance(uuid);
+            } catch (UnsupportedDrmException e) {
+                Log.e(TAG, "Failed to instantiate a FrameworkMediaDrm for uuid: " + uuid + ".");
+                return new DummyExoMediaDrm();
+            }
         }
-      };
-
+    };
   private static final String CENC_SCHEME_MIME_TYPE = "cenc";
   private static final String MOCK_LA_URL_VALUE = "https://x";
   private static final String MOCK_LA_URL = "<LA_URL>" + MOCK_LA_URL_VALUE + "</LA_URL>";
@@ -116,11 +127,17 @@ public final class FrameworkMediaDrm implements ExoMediaDrm {
 
   @Override
   public void setOnEventListener(@Nullable ExoMediaDrm.OnEventListener listener) {
-    mediaDrm.setOnEventListener(
-        listener == null
-            ? null
-            : (mediaDrm, sessionId, event, extra, data) ->
-                listener.onEvent(FrameworkMediaDrm.this, sessionId, event, extra, data));
+//    mediaDrm.setOnEventListener(
+//        listener == null
+//            ? null
+//            : (mediaDrm, sessionId, event, extra, data) ->
+//                listener.onEvent(FrameworkMediaDrm.this, sessionId, event, extra, data));
+    mediaDrm.setOnEventListener(new MediaDrm.OnEventListener() {
+        @Override
+        public void onEvent(@NonNull MediaDrm mediaDrm, @Nullable byte[] sessionId, int event, int extra, @Nullable byte[] data) {
+            listener.onEvent(FrameworkMediaDrm.this, sessionId, event, extra, data);
+        }
+    });
   }
 
   /**
@@ -137,18 +154,31 @@ public final class FrameworkMediaDrm implements ExoMediaDrm {
       throw new UnsupportedOperationException();
     }
 
-    mediaDrm.setOnKeyStatusChangeListener(
-        listener == null
-            ? null
-            : (mediaDrm, sessionId, keyInfo, hasNewUsableKey) -> {
-              List<KeyStatus> exoKeyInfo = new ArrayList<>();
-              for (MediaDrm.KeyStatus keyStatus : keyInfo) {
-                exoKeyInfo.add(new KeyStatus(keyStatus.getStatusCode(), keyStatus.getKeyId()));
-              }
-              listener.onKeyStatusChange(
-                  FrameworkMediaDrm.this, sessionId, exoKeyInfo, hasNewUsableKey);
-            },
-        /* handler= */ null);
+//    mediaDrm.setOnKeyStatusChangeListener(
+//        listener == null
+//            ? null
+//            : (mediaDrm, sessionId, keyInfo, hasNewUsableKey) -> {
+//              List<KeyStatus> exoKeyInfo = new ArrayList<>();
+//              for (MediaDrm.KeyStatus keyStatus : keyInfo) {
+//                exoKeyInfo.add(new KeyStatus(keyStatus.getStatusCode(), keyStatus.getKeyId()));
+//              }
+//              listener.onKeyStatusChange(
+//                  FrameworkMediaDrm.this, sessionId, exoKeyInfo, hasNewUsableKey);
+//            },
+//        /* handler= */ null);
+    mediaDrm.setOnKeyStatusChangeListener(new MediaDrm.OnKeyStatusChangeListener() {
+        @Override
+        public void onKeyStatusChange(@NonNull MediaDrm mediaDrm, @NonNull byte[] sessionId, @NonNull List<MediaDrm.KeyStatus> list, boolean hasNewUsableKey) {
+            if(listener!=null){
+                List<KeyStatus> exoKeyInfo = new ArrayList<>();
+                for (MediaDrm.KeyStatus keyStatus : list) {
+                    exoKeyInfo.add(new KeyStatus(keyStatus.getStatusCode(), keyStatus.getKeyId()));
+                }
+                listener.onKeyStatusChange(
+                        FrameworkMediaDrm.this, sessionId, exoKeyInfo, hasNewUsableKey);
+            }
+        }
+    },null);
   }
 
   /**
@@ -164,12 +194,20 @@ public final class FrameworkMediaDrm implements ExoMediaDrm {
       throw new UnsupportedOperationException();
     }
 
-    mediaDrm.setOnExpirationUpdateListener(
-        listener == null
-            ? null
-            : (mediaDrm, sessionId, expirationTimeMs) ->
-                listener.onExpirationUpdate(FrameworkMediaDrm.this, sessionId, expirationTimeMs),
-        /* handler= */ null);
+//    mediaDrm.setOnExpirationUpdateListener(
+//        listener == null
+//            ? null
+//            : (mediaDrm, sessionId, expirationTimeMs) ->
+//                listener.onExpirationUpdate(FrameworkMediaDrm.this, sessionId, expirationTimeMs),
+//        /* handler= */ null);
+    mediaDrm.setOnExpirationUpdateListener(new MediaDrm.OnExpirationUpdateListener() {
+        @Override
+        public void onExpirationUpdate(@NonNull MediaDrm mediaDrm, @NonNull byte[] sessionId, long expirationTimeMs) {
+            if(listener!=null){
+                listener.onExpirationUpdate(FrameworkMediaDrm.this, sessionId, expirationTimeMs);
+            }
+        }
+    }, null);
   }
 
   @Override

@@ -217,21 +217,37 @@ public final class RequirementsWatcher {
     }
 
     private void postCheckRequirements() {
-      handler.post(
-          () -> {
-            if (networkCallback != null) {
-              checkRequirements();
-            }
-          });
+//      handler.post(
+//          () -> {
+//            if (networkCallback != null) {
+//              checkRequirements();
+//            }
+//          });
+      handler.post(new Runnable() {
+          @Override
+          public void run() {
+              if (networkCallback != null) {
+                  checkRequirements();
+              }
+          }
+      });
     }
 
     private void postRecheckNotMetNetworkRequirements() {
-      handler.post(
-          () -> {
-            if (networkCallback != null) {
-              recheckNotMetNetworkRequirements();
-            }
-          });
+//      handler.post(
+//          () -> {
+//            if (networkCallback != null) {
+//              recheckNotMetNetworkRequirements();
+//            }
+//          });
+      handler.post(new Runnable() {
+          @Override
+          public void run() {
+              if (networkCallback != null) {
+                  recheckNotMetNetworkRequirements();
+              }
+          }
+      });
     }
   }
 }

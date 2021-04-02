@@ -27,7 +27,13 @@ public interface ExtractorsFactory {
    * Extractor factory that returns an empty list of extractors. Can be used whenever {@link
    * Extractor Extractors} are not required.
    */
-  ExtractorsFactory EMPTY = () -> new Extractor[] {};
+//  ExtractorsFactory EMPTY = () -> new Extractor[] {};
+  ExtractorsFactory EMPTY = new ExtractorsFactory() {
+      @Override
+      public Extractor[] createExtractors() {
+          return new Extractor[0];
+      }
+  };
 
   /** Returns an array of new {@link Extractor} instances. */
   Extractor[] createExtractors();

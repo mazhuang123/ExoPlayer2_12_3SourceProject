@@ -196,7 +196,13 @@ import java.lang.annotation.RetentionPolicy;
       bufferEnqueuer.flush();
       codec.flush();
       ++pendingFlushCount;
-      Util.castNonNull(handler).post(this::onFlushCompleted);
+//      Util.castNonNull(handler).post(this::onFlushCompleted);
+        Util.castNonNull(handler).post(new Runnable() {
+            @Override
+            public void run() {
+                onFlushCompleted();
+            }
+        });
     }
   }
 

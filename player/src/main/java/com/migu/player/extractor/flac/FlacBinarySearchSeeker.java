@@ -50,8 +50,14 @@ import static java.lang.Math.max;
       long firstFramePosition,
       long inputLength) {
     super(
-        /* seekTimestampConverter= */ flacStreamMetadata::getSampleNumber,
-        new FlacTimestampSeeker(flacStreamMetadata, frameStartMarker),
+//        /* seekTimestampConverter= */ flacStreamMetadata::getSampleNumber,
+            new SeekTimestampConverter() {
+                @Override
+                public long timeUsToTargetTime(long timeUs) {
+                    return flacStreamMetadata.getSampleNumber(timeUs);
+                }
+            },
+      new FlacTimestampSeeker(flacStreamMetadata, frameStartMarker),
         flacStreamMetadata.getDurationUs(),
         /* floorTimePosition= */ 0,
         /* ceilingTimePosition= */ flacStreamMetadata.totalSamples,

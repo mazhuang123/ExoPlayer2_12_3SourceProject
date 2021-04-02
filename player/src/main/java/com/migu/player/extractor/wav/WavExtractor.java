@@ -51,8 +51,13 @@ public final class WavExtractor implements Extractor {
   private static final int TARGET_SAMPLES_PER_SECOND = 10;
 
   /** Factory for {@link WavExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new WavExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new WavExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new WavExtractor()};
+        }
+    };
   private  ExtractorOutput extractorOutput;
   private  TrackOutput trackOutput;
   private  OutputWriter outputWriter;

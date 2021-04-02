@@ -21,6 +21,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.CheckResult;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.migu.player.C;
@@ -40,6 +41,7 @@ import com.migu.player.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -206,7 +208,13 @@ public final class DownloadManager {
   @Deprecated
   public DownloadManager(
       Context context, DatabaseProvider databaseProvider, Cache cache, Factory upstreamFactory) {
-    this(context, databaseProvider, cache, upstreamFactory, Runnable::run);
+//    this(context, databaseProvider, cache, upstreamFactory, Runnable::run);
+      this(context, databaseProvider, cache, upstreamFactory, new Executor() {
+          @Override
+          public void execute(Runnable runnable) {
+
+          }
+      });
   }
 
   /**
@@ -258,7 +266,13 @@ public final class DownloadManager {
     listeners = new CopyOnWriteArraySet<>();
 
     @SuppressWarnings("methodref.receiver.bound.invalid")
-    Handler mainHandler = Util.createHandlerForCurrentOrMainLooper(this::handleMainMessage);
+//    Handler mainHandler = Util.createHandlerForCurrentOrMainLooper(this::handleMainMessage);
+    Handler mainHandler = Util.createHandlerForCurrentOrMainLooper(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            return handleMainMessage(message);
+        }
+    });
     this.applicationHandler = mainHandler;
     HandlerThread internalThread = new HandlerThread("ExoPlayer:DownloadManager");
     internalThread.start();
@@ -273,7 +287,13 @@ public final class DownloadManager {
             downloadsPaused);
 
     @SuppressWarnings("methodref.receiver.bound.invalid")
-    RequirementsWatcher.Listener requirementsListener = this::onRequirementsStateChanged;
+//    RequirementsWatcher.Listener requirementsListener = this::onRequirementsStateChanged;
+            RequirementsWatcher.Listener requirementsListener = new RequirementsWatcher.Listener() {
+        @Override
+        public void onRequirementsStateChanged(RequirementsWatcher requirementsWatcher, int notMetRequirements) {
+            DownloadManager.this.onRequirementsStateChanged(requirementsWatcher,notMetRequirements);
+        }
+    };
     this.requirementsListener = requirementsListener;
     requirementsWatcher =
         new RequirementsWatcher(context, requirementsListener, DEFAULT_REQUIREMENTS);
@@ -932,7 +952,13 @@ public final class DownloadManager {
         downloads.add(
             copyDownloadWithState(terminalDownloads.get(i), STATE_REMOVING, STOP_REASON_NONE));
       }
-      Collections.sort(downloads, InternalHandler::compareStartTimes);
+      Collections.sort(downloads, new Comparator<Download>() {
+          @Override
+          public int compare(Download download, Download t1) {
+              return InternalHandler.compareStartTimes(download,t1);
+          }
+      });
+//      Collections.sort(downloads, InternalHandler::compareStartTimes);
       try {
         downloadIndex.setStatesToRemoving();
       } catch (IOException e) {
@@ -1221,12 +1247,24 @@ public final class DownloadManager {
       int changedIndex = getDownloadIndex(download.request.id);
       if (changedIndex == C.INDEX_UNSET) {
         downloads.add(download);
-        Collections.sort(downloads, InternalHandler::compareStartTimes);
+//        Collections.sort(downloads, InternalHandler::compareStartTimes);
+          Collections.sort(downloads, new Comparator<Download>() {
+              @Override
+              public int compare(Download download, Download t1) {
+                  return InternalHandler.compareStartTimes(download,t1);
+              }
+          });
       } else {
         boolean needsSort = download.startTimeMs != downloads.get(changedIndex).startTimeMs;
         downloads.set(changedIndex, download);
         if (needsSort) {
-          Collections.sort(downloads, InternalHandler::compareStartTimes);
+//          Collections.sort(downloads, InternalHandler::compareStartTimes);
+            Collections.sort(downloads, new Comparator<Download>() {
+                @Override
+                public int compare(Download download, Download t1) {
+                    return InternalHandler.compareStartTimes(download,t1);
+                }
+            });
         }
       }
       try {

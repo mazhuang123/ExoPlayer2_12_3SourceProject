@@ -49,7 +49,13 @@ public class DefaultDownloaderFactory implements DownloaderFactory {
    */
   @Deprecated
   public DefaultDownloaderFactory(CacheDataSource.Factory cacheDataSourceFactory) {
-    this(cacheDataSourceFactory, /* executor= */ Runnable::run);
+//    this(cacheDataSourceFactory, /* executor= */ Runnable::run);
+      this(cacheDataSourceFactory, new Executor() {
+          @Override
+          public void execute(Runnable runnable) {
+
+          }
+      });
   }
 
   /**

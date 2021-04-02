@@ -24,6 +24,7 @@ import com.migu.player.util.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -83,7 +84,13 @@ import java.util.List;
     }
     // Steps 4 - 10 of https://www.w3.org/TR/webvtt1/#cue-computed-line
     // (steps 1 - 3 are handled by WebvttCueParser#computeLine(float, int))
-    Collections.sort(cuesWithUnsetLine, (c1, c2) -> Long.compare(c1.startTimeUs, c2.startTimeUs));
+//    Collections.sort(cuesWithUnsetLine, (c1, c2) -> Long.compare(c1.startTimeUs, c2.startTimeUs));
+    Collections.sort(cuesWithUnsetLine, new Comparator<WebvttCueInfo>() {
+        @Override
+        public int compare(WebvttCueInfo c1, WebvttCueInfo c2) {
+            return Long.compare(c1.startTimeUs, c2.startTimeUs);
+        }
+    });
     for (int i = 0; i < cuesWithUnsetLine.size(); i++) {
       Cue cue = cuesWithUnsetLine.get(i).cue;
       currentCues.add(cue.buildUpon().setLine((float) (-1 - i), Cue.LINE_TYPE_NUMBER).build());

@@ -18,6 +18,7 @@ package com.migu.player.text;
 import android.support.annotation.Nullable;
 
 import com.migu.player.C;
+import com.migu.player.decoder.OutputBuffer;
 import com.migu.player.decoder.SimpleDecoder;
 import com.migu.player.util.Assertions;
 
@@ -57,7 +58,13 @@ public abstract class SimpleSubtitleDecoder extends
 
   @Override
   protected final SubtitleOutputBuffer createOutputBuffer() {
-    return new SimpleSubtitleOutputBuffer(this::releaseOutputBuffer);
+//    return new SimpleSubtitleOutputBuffer(this::releaseOutputBuffer);
+      return new SimpleSubtitleOutputBuffer(new OutputBuffer.Owner<SubtitleOutputBuffer>() {
+          @Override
+          public void releaseOutputBuffer(SubtitleOutputBuffer outputBuffer) {
+              releaseOutputBuffer(outputBuffer);
+          }
+      });
   }
 
   @Override

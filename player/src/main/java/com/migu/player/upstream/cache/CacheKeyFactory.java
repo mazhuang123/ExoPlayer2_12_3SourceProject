@@ -21,9 +21,14 @@ import com.migu.player.upstream.DataSpec;
 public interface CacheKeyFactory {
 
   /** Default {@link CacheKeyFactory}. */
-  CacheKeyFactory DEFAULT =
-      (dataSpec) -> dataSpec.key != null ? dataSpec.key : dataSpec.uri.toString();
-
+//  CacheKeyFactory DEFAULT =
+//      (dataSpec) -> dataSpec.key != null ? dataSpec.key : dataSpec.uri.toString();
+    CacheKeyFactory DEFAULT = new CacheKeyFactory() {
+        @Override
+        public String buildCacheKey(DataSpec dataSpec) {
+            return dataSpec.key != null ? dataSpec.key : dataSpec.uri.toString();
+        }
+    };
   /**
    * Returns the cache key of the resource containing the data defined by a {@link DataSpec}.
    *

@@ -48,8 +48,13 @@ import static com.migu.player.metadata.id3.Id3Decoder.ID3_TAG;
 public final class AdtsExtractor implements Extractor {
 
   /** Factory for {@link AdtsExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new AdtsExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new AdtsExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new AdtsExtractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag value is {@link
    * #FLAG_ENABLE_CONSTANT_BITRATE_SEEKING}.

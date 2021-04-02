@@ -488,7 +488,13 @@ public final class DefaultBandwidthMeter implements BandwidthMeter, TransferList
       bandwidthMeters.add(new WeakReference<>(bandwidthMeter));
       // Simulate an initial update on the main thread (like the sticky broadcast we'd receive if
       // we were to register a separate broadcast receiver for each bandwidth meter).
-      mainHandler.post(() -> updateBandwidthMeter(bandwidthMeter));
+//      mainHandler.post(() -> updateBandwidthMeter(bandwidthMeter));
+      mainHandler.post(new Runnable() {
+          @Override
+          public void run() {
+              updateBandwidthMeter(bandwidthMeter);
+          }
+      });
     }
 
     @Override

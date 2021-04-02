@@ -45,6 +45,7 @@ import com.migu.player.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1492,15 +1493,29 @@ public class DefaultTrackSelector extends MappingTrackSelector {
   private static final float FRACTION_TO_CONSIDER_FULLSCREEN = 0.98f;
   private static final int[] NO_TRACKS = new int[0];
   /** Ordering of two format values. A known value is considered greater than Format#NO_VALUE. */
-  private static final Ordering<Integer> FORMAT_VALUE_ORDERING =
-      Ordering.from(
-          (first, second) ->
-              first == Format.NO_VALUE
-                  ? (second == Format.NO_VALUE ? 0 : -1)
-                  : (second == Format.NO_VALUE ? 1 : (first - second)));
+//  private static final Ordering<Integer> FORMAT_VALUE_ORDERING =
+//      Ordering.from(
+//          (first, second) ->
+//              first == Format.NO_VALUE
+//                  ? (second == Format.NO_VALUE ? 0 : -1)
+//                  : (second == Format.NO_VALUE ? 1 : (first - second)));
+    private static final Ordering<Integer> FORMAT_VALUE_ORDERING =
+           Ordering.from(new Comparator<Integer>() {
+               @Override
+               public int compare(Integer first, Integer second) {
+                   return first == Format.NO_VALUE
+                           ? (second == Format.NO_VALUE ? 0 : -1)
+                           : (second == Format.NO_VALUE ? 1 : (first - second));
+               }
+           });
   /** Ordering where all elements are equal. */
-  private static final Ordering<Integer> NO_ORDER = Ordering.from((first, second) -> 0);
-
+//  private static final Ordering<Integer> NO_ORDER = Ordering.from((first, second) -> 0);
+    private static final Ordering<Integer> NO_ORDER = Ordering.from(new Comparator<Integer>() {
+        @Override
+        public int compare(Integer first, Integer second) {
+            return 0;
+        }
+    });
   private final TrackSelection.Factory trackSelectionFactory;
   private final AtomicReference<Parameters> parametersReference;
 

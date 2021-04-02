@@ -434,8 +434,14 @@ import static java.lang.Math.min;
 
   private void prepareChildSource(MediaSourceHolder holder) {
     MediaSource mediaSource = holder.mediaSource;
-    MediaSource.MediaSourceCaller caller =
-        (source, timeline) -> mediaSourceListInfoListener.onPlaylistUpdateRequested();
+//    MediaSource.MediaSourceCaller caller =
+//        (source, timeline) -> mediaSourceListInfoListener.onPlaylistUpdateRequested();
+      MediaSource.MediaSourceCaller caller = new MediaSource.MediaSourceCaller() {
+          @Override
+          public void onSourceInfoRefreshed(MediaSource source, Timeline timeline) {
+              mediaSourceListInfoListener.onPlaylistUpdateRequested();
+          }
+      };
     ForwardingEventListener eventListener = new ForwardingEventListener(holder);
     childSources.put(holder, new MediaSourceAndListener(mediaSource, caller, eventListener));
     mediaSource.addEventListener(Util.createHandlerForCurrentOrMainLooper(), eventListener);

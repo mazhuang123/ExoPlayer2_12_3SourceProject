@@ -38,8 +38,13 @@ import static com.migu.player.metadata.id3.Id3Decoder.ID3_TAG;
 public final class Ac4Extractor implements Extractor {
 
   /** Factory for {@link Ac4Extractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Ac4Extractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new Ac4Extractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new Ac4Extractor()};
+        }
+    };
   /**
    * The maximum number of bytes to search when sniffing, excluding ID3 information, before giving
    * up.

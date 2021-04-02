@@ -42,8 +42,13 @@ import static java.lang.Math.max;
 public final class FlvExtractor implements Extractor {
 
   /** Factory for {@link FlvExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new FlvExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new FlvExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new FlvExtractor()};
+        }
+    };
   /** Extractor states. */
   @Documented
   @Retention(RetentionPolicy.SOURCE)

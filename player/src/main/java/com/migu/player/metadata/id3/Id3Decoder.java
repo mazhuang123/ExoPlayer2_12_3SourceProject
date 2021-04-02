@@ -56,9 +56,14 @@ public final class Id3Decoder extends SimpleMetadataDecoder {
   }
 
   /** A predicate that indicates no frames should be decoded. */
-  public static final FramePredicate NO_FRAMES_PREDICATE =
-      (majorVersion, id0, id1, id2, id3) -> false;
-
+//  public static final FramePredicate NO_FRAMES_PREDICATE =
+//      (majorVersion, id0, id1, id2, id3) -> false;
+    public static final FramePredicate NO_FRAMES_PREDICATE = new FramePredicate() {
+        @Override
+        public boolean evaluate(int majorVersion, int id0, int id1, int id2, int id3) {
+            return false;
+        }
+    };
   private static final String TAG = "Id3Decoder";
 
   /** The first three bytes of a well formed ID3 tag header. */

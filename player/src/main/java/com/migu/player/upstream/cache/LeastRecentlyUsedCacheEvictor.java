@@ -17,6 +17,7 @@ package com.migu.player.upstream.cache;
 
 import com.migu.player.C;
 
+import java.util.Comparator;
 import java.util.TreeSet;
 
 /** Evicts least recently used cache files first. */
@@ -29,7 +30,13 @@ public final class LeastRecentlyUsedCacheEvictor implements CacheEvictor {
 
   public LeastRecentlyUsedCacheEvictor(long maxBytes) {
     this.maxBytes = maxBytes;
-    this.leastRecentlyUsed = new TreeSet<>(LeastRecentlyUsedCacheEvictor::compare);
+//    this.leastRecentlyUsed = new TreeSet<>(LeastRecentlyUsedCacheEvictor::compare);
+      this.leastRecentlyUsed = new TreeSet<>(new Comparator<CacheSpan>() {
+          @Override
+          public int compare(CacheSpan cacheSpan, CacheSpan t1) {
+              return compare(cacheSpan,t1);
+          }
+      });
   }
 
   @Override

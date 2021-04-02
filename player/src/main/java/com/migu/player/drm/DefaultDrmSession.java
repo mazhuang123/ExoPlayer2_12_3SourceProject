@@ -315,13 +315,13 @@ import static java.lang.Math.min;
         mediaDrm.closeSession(sessionId);
         sessionId = null;
       }
-//      dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
-//          @Override
-//          public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
-//              eventDispatcher.drmSessionReleased();
-//          }
-//      });
-      dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionReleased);
+      dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+          @Override
+          public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+              eventDispatcher.drmSessionReleased();
+          }
+      });
+//      dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionReleased);
     }
     if (eventDispatcher != null) {
       if (isOpen()) {
@@ -352,13 +352,13 @@ import static java.lang.Math.min;
     try {
       sessionId = mediaDrm.openSession();
       mediaCrypto = mediaDrm.createMediaCrypto(sessionId);
-//      dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
-//          @Override
-//          public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
-//              eventDispatcher.drmSessionAcquired();
-//          }
-//      });
-      dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionAcquired);
+      dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+          @Override
+          public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+              eventDispatcher.drmSessionAcquired();
+          }
+      });
+//      dispatchEvent(DrmSessionEventListener.EventDispatcher::drmSessionAcquired);
       state = STATE_OPENED;
       Assertions.checkNotNull(sessionId);
       return true;
@@ -421,7 +421,13 @@ import static java.lang.Math.min;
             onError(new KeysExpiredException());
           } else {
             state = STATE_OPENED_WITH_KEYS;
-            dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysRestored);
+//            dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysRestored);
+            dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+                @Override
+                public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+                    eventDispatcher.drmKeysRestored();
+                }
+            });
           }
         }
         break;
@@ -490,7 +496,13 @@ import static java.lang.Math.min;
       byte[] responseData = (byte[]) response;
       if (mode == DefaultDrmSessionManager.MODE_RELEASE) {
         mediaDrm.provideKeyResponse(Util.castNonNull(offlineLicenseKeySetId), responseData);
-        dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysRemoved);
+//        dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysRemoved);
+        dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+            @Override
+            public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+                eventDispatcher.drmKeysRemoved();
+            }
+        });
       } else {
         byte[] keySetId = mediaDrm.provideKeyResponse(sessionId, responseData);
         if ((mode == DefaultDrmSessionManager.MODE_DOWNLOAD
@@ -501,7 +513,13 @@ import static java.lang.Math.min;
           offlineLicenseKeySetId = keySetId;
         }
         state = STATE_OPENED_WITH_KEYS;
-        dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysLoaded);
+//        dispatchEvent(DrmSessionEventListener.EventDispatcher::drmKeysLoaded);
+        dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+            @Override
+            public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+                eventDispatcher.drmKeysLoaded();
+            }
+        });
       }
     } catch (Exception e) {
       onKeysError(e);
@@ -525,7 +543,13 @@ import static java.lang.Math.min;
 
   private void onError(final Exception e) {
     lastException = new DrmSessionException(e);
-    dispatchEvent(eventDispatcher -> eventDispatcher.drmSessionManagerError(e));
+//    dispatchEvent(eventDispatcher -> eventDispatcher.drmSessionManagerError(e));
+    dispatchEvent(new Consumer<DrmSessionEventListener.EventDispatcher>() {
+        @Override
+        public void accept(DrmSessionEventListener.EventDispatcher eventDispatcher) {
+            eventDispatcher.drmSessionManagerError(e);
+        }
+    });
     if (state != STATE_OPENED_WITH_KEYS) {
       state = STATE_ERROR;
     }

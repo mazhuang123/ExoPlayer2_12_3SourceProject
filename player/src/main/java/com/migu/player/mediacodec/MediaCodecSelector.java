@@ -31,15 +31,15 @@ public interface MediaCodecSelector {
    * Default implementation of {@link MediaCodecSelector}, which returns the preferred decoder for
    * the given format.
    */
-  MediaCodecSelector DEFAULT = MediaCodecUtil::getDecoderInfos;
-//  MediaCodecSelector DEFAULT = new MediaCodecSelector() {
-//      @Override
-//      public List<MediaCodecInfo> getDecoderInfos(
-//              String mimeType, boolean requiresSecureDecoder, boolean requiresTunnelingDecoder)
-//              throws DecoderQueryException {
-//          return MediaCodecUtil.getDecoderInfos(mimeType, requiresSecureDecoder, requiresTunnelingDecoder);
-//      }
-//  };
+//  MediaCodecSelector DEFAULT = MediaCodecUtil::getDecoderInfos;
+  MediaCodecSelector DEFAULT = new MediaCodecSelector() {
+      @Override
+      public List<MediaCodecInfo> getDecoderInfos(
+              String mimeType, boolean requiresSecureDecoder, boolean requiresTunnelingDecoder)
+              throws DecoderQueryException {
+          return MediaCodecUtil.getDecoderInfos(mimeType, requiresSecureDecoder, requiresTunnelingDecoder);
+      }
+  };
 
   /**
    * Returns a list of decoders that can decode media in the specified MIME type, in priority order.

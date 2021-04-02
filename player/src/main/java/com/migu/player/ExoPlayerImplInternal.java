@@ -384,9 +384,21 @@ import static java.lang.Math.min;
           .obtainMessage(MSG_SET_FOREGROUND_MODE, /* foregroundMode */ 0, 0, processedFlag)
           .sendToTarget();
       if (releaseTimeoutMs > 0) {
-        waitUninterruptibly(/* condition= */ processedFlag::get, releaseTimeoutMs);
+//        waitUninterruptibly(/* condition= */ processedFlag::get, releaseTimeoutMs);
+        waitUninterruptibly(new Supplier<Boolean>() {
+            @Override
+            public Boolean get() {
+                return processedFlag.get();
+            }
+        },releaseTimeoutMs);
       } else {
-        waitUninterruptibly(/* condition= */ processedFlag::get);
+//        waitUninterruptibly(/* condition= */ processedFlag::get);
+          waitUninterruptibly(new Supplier<Boolean>() {
+              @Override
+              public Boolean get() {
+                  return processedFlag.get();
+              }
+          });
       }
       return processedFlag.get();
     }
@@ -399,9 +411,21 @@ import static java.lang.Math.min;
 
     handler.sendEmptyMessage(MSG_RELEASE);
     if (releaseTimeoutMs > 0) {
-      waitUninterruptibly(/* condition= */ () -> released, releaseTimeoutMs);
+//      waitUninterruptibly(/* condition= */ () -> released, releaseTimeoutMs);
+      waitUninterruptibly(new Supplier<Boolean>() {
+          @Override
+          public Boolean get() {
+              return released;
+          }
+      }, releaseTimeoutMs);
     } else {
-      waitUninterruptibly(/* condition= */ () -> released);
+        waitUninterruptibly(new Supplier<Boolean>() {
+            @Override
+            public Boolean get() {
+                return released;
+            }
+        });
+//      waitUninterruptibly(/* condition= */ () -> released);
     }
     return released;
   }
@@ -1385,15 +1409,26 @@ import static java.lang.Math.min;
       message.markAsProcessed(/* isDelivered= */ false);
       return;
     }
-    handler.post(
-        () -> {
-          try {
-            deliverMessage(message);
-          } catch (ExoPlaybackException e) {
-            Log.e(TAG, "Unexpected error delivering message on external thread.", e);
-            throw new RuntimeException(e);
-          }
-        });
+//    handler.post(
+//        () -> {
+//          try {
+//            deliverMessage(message);
+//          } catch (ExoPlaybackException e) {
+//            Log.e(TAG, "Unexpected error delivering message on external thread.", e);
+//            throw new RuntimeException(e);
+//          }
+//        });
+    handler.post(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                deliverMessage(message);
+            } catch (ExoPlaybackException e) {
+                Log.e(TAG, "Unexpected error delivering message on external thread.", e);
+                throw new RuntimeException(e);
+            }
+        }
+    });
   }
 
   private void deliverMessage(PlayerMessage message) throws ExoPlaybackException {

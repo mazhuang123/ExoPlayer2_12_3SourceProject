@@ -60,10 +60,17 @@ public final class FixedTrackSelection extends BaseTrackSelection {
     @Override
     public  TrackSelection[] createTrackSelections(
          Definition[] definitions, BandwidthMeter bandwidthMeter) {
+//      return TrackSelectionUtil.createTrackSelectionsForDefinitions(
+//          definitions,
+//          definition ->
+//              new FixedTrackSelection(definition.group, definition.tracks[0], reason, data));
       return TrackSelectionUtil.createTrackSelectionsForDefinitions(
-          definitions,
-          definition ->
-              new FixedTrackSelection(definition.group, definition.tracks[0], reason, data));
+              definitions, new TrackSelectionUtil.AdaptiveTrackSelectionFactory() {
+                  @Override
+                  public TrackSelection createAdaptiveTrackSelection(Definition trackSelectionDefinition) {
+                      return new FixedTrackSelection(trackSelectionDefinition.group, trackSelectionDefinition.tracks[0], reason, data);
+                  }
+              });
     }
   }
 

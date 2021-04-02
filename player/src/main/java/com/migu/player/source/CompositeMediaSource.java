@@ -110,9 +110,15 @@ public abstract class CompositeMediaSource<T> extends BaseMediaSource {
    */
   protected final void prepareChildSource( T id, MediaSource mediaSource) {
     Assertions.checkArgument(!childSources.containsKey(id));
-    MediaSourceCaller caller =
-        (source, timeline) -> onChildSourceInfoRefreshed(id, source, timeline);
-    ForwardingEventListener eventListener = new ForwardingEventListener(id);
+    MediaSourceCaller caller;
+//      caller = (source, timeline) -> onChildSourceInfoRefreshed(id, source, timeline);
+      caller = new MediaSourceCaller() {
+          @Override
+          public void onSourceInfoRefreshed(MediaSource source, Timeline timeline) {
+              onChildSourceInfoRefreshed(id,source,timeline);
+          }
+      };
+      ForwardingEventListener eventListener = new ForwardingEventListener(id);
     childSources.put(id, new MediaSourceAndListener(mediaSource, caller, eventListener));
     mediaSource.addEventListener(Assertions.checkNotNull(eventHandler), eventListener);
     mediaSource.addDrmEventListener(Assertions.checkNotNull(eventHandler), eventListener);

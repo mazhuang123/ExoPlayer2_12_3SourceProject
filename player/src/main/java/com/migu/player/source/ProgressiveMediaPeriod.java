@@ -192,14 +192,29 @@ import static java.lang.Math.min;
         new BundledExtractorsAdapter(extractorsFactory);
     this.progressiveMediaExtractor = progressiveMediaExtractor;
     loadCondition = new ConditionVariable();
-    maybeFinishPrepareRunnable = this::maybeFinishPrepare;
-    onContinueLoadingRequestedRunnable =
-        () -> {
-          if (!released) {
-            Assertions.checkNotNull(callback)
-                .onContinueLoadingRequested(ProgressiveMediaPeriod.this);
-          }
-        };
+//    maybeFinishPrepareRunnable = this::maybeFinishPrepare;
+    maybeFinishPrepareRunnable = new Runnable() {
+        @Override
+        public void run() {
+            ProgressiveMediaPeriod.this.maybeFinishPrepare();
+        }
+    };
+//    onContinueLoadingRequestedRunnable =
+//        () -> {
+//          if (!released) {
+//            Assertions.checkNotNull(callback)
+//                .onContinueLoadingRequested(ProgressiveMediaPeriod.this);
+//          }
+//        };
+    onContinueLoadingRequestedRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!released) {
+                Assertions.checkNotNull(callback)
+                        .onContinueLoadingRequested(ProgressiveMediaPeriod.this);
+            }
+        }
+    };
     handler = Util.createHandlerForCurrentLooper();
     sampleQueueTrackIds = new TrackId[0];
     sampleQueues = new SampleQueue[0];
@@ -691,7 +706,13 @@ import static java.lang.Math.min;
 
   @Override
   public void seekMap(SeekMap seekMap) {
-    handler.post(() -> setSeekMap(seekMap));
+//    handler.post(() -> setSeekMap(seekMap));
+    handler.post(new Runnable() {
+        @Override
+        public void run() {
+            setSeekMap(seekMap);
+        }
+    });
   }
 
   // Icy metadata. Called by the loading thread.

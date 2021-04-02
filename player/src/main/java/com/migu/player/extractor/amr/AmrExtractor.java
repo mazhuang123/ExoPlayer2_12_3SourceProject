@@ -49,8 +49,13 @@ import java.util.Arrays;
 public final class AmrExtractor implements Extractor {
 
   /** Factory for {@link AmrExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new AmrExtractor()};
-
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new AmrExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new AmrExtractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag value is {@link
    * #FLAG_ENABLE_CONSTANT_BITRATE_SEEKING}.

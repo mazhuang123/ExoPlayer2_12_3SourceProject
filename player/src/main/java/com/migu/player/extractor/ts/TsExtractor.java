@@ -57,7 +57,13 @@ import static com.migu.player.extractor.ts.TsPayloadReader.FLAG_PAYLOAD_UNIT_STA
 public final class TsExtractor implements Extractor {
 
   /** Factory for {@link TsExtractor} instances. */
-  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new TsExtractor()};
+//  public static final ExtractorsFactory FACTORY = () -> new Extractor[] {new TsExtractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new TsExtractor()};
+        }
+    };
 
   /**
    * Modes for the extractor. One of {@link #MODE_MULTI_PMT}, {@link #MODE_SINGLE_PMT} or {@link

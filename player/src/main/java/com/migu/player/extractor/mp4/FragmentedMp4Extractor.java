@@ -20,6 +20,7 @@ import android.support.annotation.Nullable;
 import android.util.Pair;
 import android.util.SparseArray;
 
+import com.google.common.base.Function;
 import com.migu.player.C;
 import com.migu.player.Format;
 import com.migu.player.ParserException;
@@ -36,6 +37,7 @@ import com.migu.player.extractor.GaplessInfoHolder;
 import com.migu.player.extractor.PositionHolder;
 import com.migu.player.extractor.SeekMap;
 import com.migu.player.extractor.TrackOutput;
+import com.migu.player.extractor.flac.FlacExtractor;
 import com.migu.player.extractor.mp4.Atom.ContainerAtom;
 import com.migu.player.extractor.mp4.Atom.LeafAtom;
 import com.migu.player.metadata.emsg.EventMessage;
@@ -70,9 +72,14 @@ import static java.lang.Math.max;
 public class FragmentedMp4Extractor implements Extractor {
 
   /** Factory for {@link FragmentedMp4Extractor} instances. */
-  public static final ExtractorsFactory FACTORY =
-      () -> new Extractor[] {new FragmentedMp4Extractor()};
-
+//  public static final ExtractorsFactory FACTORY =
+//      () -> new Extractor[] {new FragmentedMp4Extractor()};
+    public static final ExtractorsFactory FACTORY = new ExtractorsFactory() {
+        @Override
+        public Extractor[] createExtractors() {
+            return new Extractor[] {new FragmentedMp4Extractor()};
+        }
+    };
   /**
    * Flags controlling the behavior of the extractor. Possible flag values are {@link
    * #FLAG_WORKAROUND_EVERY_VIDEO_FRAME_IS_SYNC_FRAME}, {@link #FLAG_WORKAROUND_IGNORE_TFDT_BOX},
@@ -512,16 +519,29 @@ public class FragmentedMp4Extractor implements Extractor {
     }
 
     // Construction of tracks and sample tables.
-    List<TrackSampleTable> sampleTables =
-        parseTraks(
-            moov,
-            new GaplessInfoHolder(),
-            duration,
-            drmInitData,
-            /* ignoreEditLists= */ (flags & FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0,
-            /* isQuickTime= */ false,
-            this::modifyTrack);
-
+//    List<TrackSampleTable> sampleTables =
+//        parseTraks(
+//            moov,
+//            new GaplessInfoHolder(),
+//            duration,
+//            drmInitData,
+//            /* ignoreEditLists= */ (flags & FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0,
+//            /* isQuickTime= */ false,
+//            this::modifyTrack);
+      List<TrackSampleTable> sampleTables =
+              parseTraks(
+                      moov,
+                      new GaplessInfoHolder(),
+                      duration,
+                      drmInitData,
+                      /* ignoreEditLists= */ (flags & FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0,
+                      /* isQuickTime= */ false,
+                      new Function<Track, Track>() {
+                          @Override
+                          public Track apply(Track track) {
+                              return modifyTrack(track);
+                          }
+                      });
     int trackCount = sampleTables.size();
     if (trackBundles.size() == 0) {
       // We need to create the track bundles.

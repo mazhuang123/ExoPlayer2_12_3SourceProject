@@ -914,7 +914,13 @@ public abstract class DownloadService extends Service {
       notificationDisplayed = true;
       if (periodicUpdatesStarted) {
         handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(this::update, updateInterval);
+//        handler.postDelayed(this::update, updateInterval);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                update();
+            }
+        }, updateInterval);
       }
     }
   }
@@ -952,9 +958,15 @@ public abstract class DownloadService extends Service {
         // DownloadService.getForegroundNotification, and concrete subclass implementations may
         // not anticipate the possibility of this method being called before their onCreate
         // implementation has finished executing.
-        Util.createHandlerForCurrentOrMainLooper()
-            .postAtFrontOfQueue(
-                () -> downloadService.notifyDownloads(downloadManager.getCurrentDownloads()));
+//        Util.createHandlerForCurrentOrMainLooper()
+//            .postAtFrontOfQueue(
+//                () -> downloadService.notifyDownloads(downloadManager.getCurrentDownloads()));
+        Util.createHandlerForCurrentOrMainLooper().postAtFrontOfQueue(new Runnable() {
+            @Override
+            public void run() {
+                downloadService.notifyDownloads(downloadManager.getCurrentDownloads());
+            }
+        });
       }
     }
 

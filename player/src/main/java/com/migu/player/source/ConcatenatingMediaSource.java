@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.GuardedBy;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.migu.player.AbstractConcatenatedTimeline;
@@ -458,7 +459,13 @@ public final class ConcatenatingMediaSource extends CompositeMediaSource<MediaSo
   protected synchronized void prepareSourceInternal(
       @Nullable TransferListener mediaTransferListener) {
     super.prepareSourceInternal(mediaTransferListener);
-    playbackThreadHandler = new Handler(/* callback= */ this::handleMessage);
+//    playbackThreadHandler = new Handler(/* callback= */ this::handleMessage);
+      playbackThreadHandler = new Handler(/* callback= */ new Handler.Callback() {
+          @Override
+          public boolean handleMessage(@NonNull Message message) {
+              return ConcatenatingMediaSource.this.handleMessage(message);
+          }
+      });
     if (mediaSourcesPublic.isEmpty()) {
       updateTimelineAndScheduleOnCompletionActions();
     } else {
