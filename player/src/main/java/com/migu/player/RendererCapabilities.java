@@ -163,7 +163,7 @@ public interface RendererCapabilities {
   @Documented
   @Retention(RetentionPolicy.SOURCE)
   // Intentionally empty to prevent assignment or comparison with individual flags without masking.
-  @IntDef({})
+//  @IntDef({})
   @interface Capabilities {}
 
   /**

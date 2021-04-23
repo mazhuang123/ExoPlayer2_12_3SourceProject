@@ -1,2 +1,2 @@
 include ':app', ':player'
-rootProject.name='RenameProject'
+rootProject.name='ExoPlayer2_12_3SourceProject'
