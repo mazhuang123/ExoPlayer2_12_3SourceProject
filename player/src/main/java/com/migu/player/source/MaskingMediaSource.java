@@ -77,6 +77,9 @@ public final class MaskingMediaSource extends CompositeMediaSource<Void> {
     return timeline;
   }
 
+  public String getMediaSourceId(){
+      return  mediaSource.toString();
+  }
   @Override
   public void prepareSourceInternal(@Nullable TransferListener mediaTransferListener) {
     super.prepareSourceInternal(mediaTransferListener);

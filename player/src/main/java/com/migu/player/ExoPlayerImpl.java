@@ -1611,8 +1611,8 @@ import static java.lang.Math.min;
           invokeAll(listenerSnapshot, new ListenerInvocation() {
               @Override
               public void invokeListener(EventListener listener) {
-                  listener.onExperimentalOffloadSchedulingEnabledChanged(
-                          playbackInfo.offloadSchedulingEnabled);
+//                  listener.onExperimentalOffloadSchedulingEnabledChanged(
+//                          playbackInfo.offloadSchedulingEnabled);
               }
           });
 //        invokeAll(
